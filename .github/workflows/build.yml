@@ -73,6 +73,16 @@ jobs:
         wget -q https://github.com/ZyCromerZ/Clang/releases/download/16.0.6-20260807-release/Clang-16.0.6-20260807.tar.gz
         tar -zxvf Clang-16.0.6-20260807.tar.gz
 
+    - name: Apply reboot fix (PR #61 + PR #62)
+      run: |
+        curl -sL https://github.com/AstideLabs/android_kernel_xiaomi_sm8250/pull/61.diff | git apply -v - || \
+        curl -sL https://github.com/AstideLabs/android_kernel_xiaomi_sm8250/pull/61.diff | git apply -v --3way --ignore-whitespace -
+        curl -sL https://github.com/AstideLabs/android_kernel_xiaomi_sm8250/pull/62.diff | git apply -v - || \
+        curl -sL https://github.com/AstideLabs/android_kernel_xiaomi_sm8250/pull/62.diff | git apply -v --3way --ignore-whitespace -
+        git diff --stat
+        grep -n "USB_PHY_TYPE_USB3_AND_DP" drivers/usb/phy/phy-msm-ssusb-qmp.c | head -5
+        grep -n "pm_runtime_suspended(dev)" drivers/usb/host/xhci-plat.c | head -5
+
     - name: Run Build Script
       run: |
         chmod +x build_kernel.sh
